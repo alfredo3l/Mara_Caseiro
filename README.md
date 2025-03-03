@@ -1,4 +1,4 @@
-# Evolução Política - Sistema de Gestão de Campanha
+# Mara Caseiro - Sistema de Gestão de Campanha
 
 Sistema completo para gestão de campanhas políticas, apoiadores, demandas, eventos e apoios políticos.
 
