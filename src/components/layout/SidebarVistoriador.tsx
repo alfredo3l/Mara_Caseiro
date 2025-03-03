@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Home, MapPin, Calendar, Clock, Settings, LogOut, Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 // Dados mockados de vistorias para exemplo
 export const vistorias = [
@@ -47,6 +48,7 @@ interface SidebarVistoriadorProps {
 export default function SidebarVistoriador({ isOpen = true, onClose }: SidebarVistoriadorProps) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const { logout } = useAuthContext();
 
   const menuItems = [
     { href: '/dashboard/vistoriador', icon: <Home size={20} />, label: 'Início' },
@@ -57,6 +59,18 @@ export default function SidebarVistoriador({ isOpen = true, onClose }: SidebarVi
 
   const isActive = (path: string) => {
     return pathname === path;
+  };
+
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      
+      if (!result.success) {
+        console.error('Erro ao fazer logout:', result.error);
+      }
+    } catch (error) {
+      console.error('Erro ao processar logout:', error);
+    }
   };
 
   return (
@@ -127,10 +141,7 @@ export default function SidebarVistoriador({ isOpen = true, onClose }: SidebarVi
               </li>
               <li>
                 <button
-                  onClick={() => {
-                    // Lógica de logout aqui
-                    console.log('Logout');
-                  }}
+                  onClick={handleLogout}
                   className="flex items-center w-full p-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   <LogOut size={20} className="mr-3" />

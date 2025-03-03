@@ -55,16 +55,33 @@ export default function RegisterPage() {
       return;
     }
     
-    // Tentar registrar com Supabase
-    const result = await register({
-      name: formData.name,
-      document: formData.document,
-      email: formData.email,
-      password: formData.password
-    });
+    // Limpar erro antes de tentar registrar
+    setFormError(null);
     
-    if (!result.success) {
-      setFormError(result.error || 'Falha ao criar conta');
+    try {
+      // Tentar registrar com Supabase
+      const result = await register({
+        name: formData.name,
+        document: formData.document,
+        email: formData.email,
+        password: formData.password
+      });
+      
+      if (result.success) {
+        // Mostrar mensagem de sucesso antes do redirecionamento
+        setFormError(null);
+        // Exibir mensagem de sucesso
+        alert('Cadastro realizado com sucesso! Você será redirecionado para a página de login.');
+        
+        // Redirecionar para a página de login usando window.location para garantir um redirecionamento completo
+        window.location.href = '/login';
+      } else {
+        // Exibir mensagem de erro
+        setFormError(result.error || 'Falha ao criar conta');
+      }
+    } catch (error) {
+      console.error('Erro ao processar o cadastro:', error);
+      setFormError('Ocorreu um erro ao processar o cadastro. Por favor, tente novamente.');
     }
   };
 

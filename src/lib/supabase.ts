@@ -14,8 +14,14 @@ console.info(
   }
 );
 
-// Criar o cliente Supabase
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Criar o cliente Supabase com opções adicionais para melhorar a estabilidade
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
 // Função para verificar se estamos usando o cliente real
 export const isRealSupabaseClient = () => true;
@@ -26,4 +32,17 @@ if (typeof window !== 'undefined') {
     '%c[Supabase] Cliente configurado com sucesso!',
     'background: #3ECF8E; color: #000; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
   );
+  
+  // Verificar se o cliente está funcionando
+  supabase.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      console.error('%c[Supabase] Erro ao verificar sessão:', 'color: red', error);
+    } else {
+      console.info(
+        '%c[Supabase] Sessão verificada com sucesso!',
+        'background: #3ECF8E; color: #000; font-weight: bold; padding: 4px 8px; border-radius: 4px;',
+        { hasSession: !!data.session }
+      );
+    }
+  });
 } 

@@ -20,13 +20,22 @@ const NoSSR = dynamic<NoSSRProps>(() =>
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, loading, error } = useAuth();
+  const { login, loading, error: authError, user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [formError, setFormError] = useState<string | null>(null);
+
+  // Verificar se o usuário já está autenticado
+  useEffect(() => {
+    console.log('Estado do usuário:', { user, loading });
+    if (user && !loading) {
+      console.log('Usuário já autenticado, redirecionando para dashboard...');
+      router.push('/dashboard');
+    }
+  }, [user, loading, router]);
 
   // Limpar erro do formulário quando os dados mudam
   useEffect(() => {
@@ -35,8 +44,20 @@ export default function LoginPage() {
     }
   }, [formData]);
 
+  // Atualizar erro do formulário quando o erro de autenticação mudar
+  useEffect(() => {
+    if (authError) {
+      setFormError(authError);
+    }
+  }, [authError]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Limpar erros anteriores
+    setFormError(null);
+    
+    console.log('Iniciando tentativa de login com:', { email: formData.email });
     
     // Validação básica
     if (!formData.email || !formData.password) {
@@ -44,14 +65,25 @@ export default function LoginPage() {
       return;
     }
     
-    // Tentar fazer login com Supabase
-    const result = await login({
-      email: formData.email,
-      password: formData.password
-    });
-    
-    if (!result.success) {
-      setFormError(result.error || 'Falha ao fazer login');
+    try {
+      // Tentar fazer login com Supabase
+      console.log('Chamando função de login...');
+      const result = await login({
+        email: formData.email,
+        password: formData.password
+      });
+      
+      console.log('Resultado do login:', result);
+      
+      if (!result.success) {
+        setFormError(result.error || 'Falha ao fazer login');
+      } else {
+        console.log('Login bem-sucedido, aguardando redirecionamento...');
+        // O redirecionamento será feito pelo useEffect quando o usuário for atualizado
+      }
+    } catch (error) {
+      console.error('Erro ao processar login:', error);
+      setFormError('Erro ao processar login. Tente novamente.');
     }
   };
 

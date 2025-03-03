@@ -3,6 +3,7 @@
 import { LogOut, Settings, Building2, Sparkles, ChevronLeftCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export default function SidebarImobiliaria({ 
   isOpen, 
@@ -12,9 +13,19 @@ export default function SidebarImobiliaria({
   onSettingsClick
 }: SidebarImobiliariaProps) {
   const router = useRouter();
+  const { logout } = useAuthContext();
 
-  const handleLogout = () => {
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      
+      if (!result.success) {
+        console.error('Erro ao fazer logout:', result.error);
+      }
+      // O redirecionamento já é feito dentro da função logout
+    } catch (error) {
+      console.error('Erro ao processar logout:', error);
+    }
   };
 
   return (

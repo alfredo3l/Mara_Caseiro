@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useUsuario } from '@/contexts/UsuarioContext';
+import { useAuthContext } from '@/contexts/AuthContext';
 import NotificacoesDropdown from '@/components/ui/NotificacoesDropdown';
 
 interface ClientHeaderProps {
@@ -20,6 +21,7 @@ export default function ClientHeader({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
   const { usuario } = useUsuario();
+  const { logout } = useAuthContext();
   
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -50,15 +52,22 @@ export default function ClientHeader({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    // Fechar o menu do usuário
-    setShowUserMenu(false);
-    
-    // Simulação de logout - em uma aplicação real, você chamaria uma API de logout
-    localStorage.removeItem('usuario');
-    
-    // Redirecionar para a página inicial
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      // Fechar o menu do usuário
+      setShowUserMenu(false);
+      
+      // Usar a função de logout do contexto de autenticação
+      const result = await logout();
+      
+      if (!result.success) {
+        console.error('Erro ao fazer logout:', result.error);
+      }
+      
+      // O redirecionamento já é feito dentro da função logout do contexto
+    } catch (error) {
+      console.error('Erro ao processar logout:', error);
+    }
   };
 
   return (

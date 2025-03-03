@@ -120,7 +120,7 @@ export class SupabaseService {
    * @param data Dados do registro
    * @returns Registro criado
    */
-  async create<T>(data: Partial<T>): Promise<T> {
+  async create<T>(data: Partial<T>): Promise<T | null> {
     try {
       console.log(`Iniciando criação na tabela ${this.table} com dados:`, data);
       
@@ -132,14 +132,19 @@ export class SupabaseService {
 
       if (error) {
         console.error(`Erro ao criar registro na tabela ${this.table}:`, error);
-        throw error;
+        return null;
+      }
+
+      if (!createdData) {
+        console.error(`Nenhum dado retornado ao criar registro na tabela ${this.table}`);
+        return null;
       }
 
       console.log(`Registro criado com sucesso na tabela ${this.table}:`, createdData);
       return createdData as T;
     } catch (error) {
-      console.error(`Erro ao criar registro na tabela ${this.table}:`, error);
-      throw error;
+      console.error(`Exceção ao criar registro na tabela ${this.table}:`, error);
+      return null;
     }
   }
 

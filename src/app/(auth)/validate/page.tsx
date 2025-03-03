@@ -16,6 +16,7 @@ export default function ValidatePage() {
     
     // Verificar se o usuário está autenticado
     if (loading) {
+      console.log('Aguardando carregamento do estado de autenticação...');
       return; // Aguardar carregamento do estado de autenticação
     }
     
@@ -47,8 +48,12 @@ export default function ValidatePage() {
   useEffect(() => {
     if (progress === 100) {
       console.log('Validação concluída, redirecionando para dashboard...');
-      // Redirecionar imediatamente
-      router.push('/dashboard');
+      // Pequeno atraso para garantir que a animação seja vista
+      const redirectTimer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 300);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [progress, router]);
 

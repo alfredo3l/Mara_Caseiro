@@ -5,6 +5,7 @@ import { Bell, Menu, ChevronDown } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useUsuario } from '@/contexts/UsuarioContext';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -25,6 +26,7 @@ export function Header({ onMenuClick, fullWidth = false, isMenuOpen = false, isM
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
   const { usuario } = useUsuario();
+  const { logout } = useAuthContext();
 
   // Obter as iniciais do nome do usuário
   const getInitials = (name: string) => {
@@ -98,10 +100,19 @@ export function Header({ onMenuClick, fullWidth = false, isMenuOpen = false, isM
     },
   ];
 
-  const handleLogout = (): void => {
-    // Simulação de logout - em uma aplicação real, você chamaria uma API de logout
-    localStorage.removeItem('usuario');
-    router.push('/');
+  const handleLogout = async (): Promise<void> => {
+    try {
+      // Usar a função de logout do contexto de autenticação
+      const result = await logout();
+      
+      if (!result.success) {
+        console.error('Erro ao fazer logout:', result.error);
+      }
+      
+      // O redirecionamento já é feito dentro da função logout do contexto
+    } catch (error) {
+      console.error('Erro ao processar logout:', error);
+    }
   };
 
   const handleProfileChange = (profile: string) => {

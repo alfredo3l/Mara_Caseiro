@@ -1,6 +1,7 @@
 import { usuariosService } from './supabase';
 import { User } from '@supabase/supabase-js';
 import { getOrganizacaoId, getOrganizacaoNome } from '@/config/organizacao';
+import { supabase } from '@/lib/supabase';
 
 export interface UsuarioData {
   id: string;
@@ -82,19 +83,28 @@ export async function criarUsuario(
   }
 ): Promise<UsuarioData | null> {
   try {
+    console.log('Iniciando criação de usuário para:', authUser.email);
+    
     const organizacaoId = getOrganizacaoId();
     const organizacaoNome = getOrganizacaoNome();
     
+    console.log('Dados da organização:', { organizacaoId, organizacaoNome });
+    
     if (!authUser.id || !authUser.email) {
       console.error('Dados do usuário auth inválidos:', authUser);
-      throw new Error('Dados do usuário auth inválidos');
+      return null;
     }
     
     // Verificar se já existe um usuário com este auth_id
-    const usuarioExistente = await obterUsuarioPorAuthId(authUser.id);
-    if (usuarioExistente) {
-      console.log('Usuário já existe na tabela usuarios:', usuarioExistente);
-      return usuarioExistente;
+    try {
+      const usuarioExistente = await obterUsuarioPorAuthId(authUser.id);
+      if (usuarioExistente) {
+        console.log('Usuário já existe na tabela usuarios:', usuarioExistente);
+        return usuarioExistente;
+      }
+    } catch (error) {
+      console.error('Erro ao verificar usuário existente:', error);
+      // Continuar mesmo se houver erro na verificação
     }
     
     // Criar usuário na tabela usuarios
@@ -104,37 +114,73 @@ export async function criarUsuario(
       nome: dados.nome,
       email: authUser.email,
       perfil: dados.perfil,
-      status: 'ativo' as const
+      status: 'ativo' as const,
+      ultimo_acesso: new Date().toISOString()
     };
     
-    console.log('Criando novo usuário:', novoUsuario);
-    const resultado = await usuariosService.create<UsuarioData>(novoUsuario);
-    console.log('Resultado da criação:', resultado);
+    console.log('Tentando criar novo usuário com dados:', novoUsuario);
     
-    if (!resultado) {
-      throw new Error('Falha ao criar usuário na tabela usuarios');
-    }
-    
-    // Atualizar os metadados do usuário no auth
-    const { error: updateError } = await usuariosService.customQuery(
-      (query) => query.auth.updateUser(authUser.id, {
-        data: {
-          organizacao_id: organizacaoId,
-          organizacao_nome: organizacaoNome,
-          nome: dados.nome,
-          perfil: dados.perfil
+    try {
+      // Tentar criar o usuário diretamente com o Supabase
+      const { data: createdData, error } = await supabase
+        .from('usuarios')
+        .insert(novoUsuario)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Erro ao criar usuário na tabela usuarios:', error);
+        
+        // Verificar se o erro é de conflito (usuário já existe)
+        if (error.code === '23505') { // Código de erro de violação de chave única
+          console.log('Usuário já existe na tabela, tentando obter...');
+          const usuarioExistente = await obterUsuarioPorAuthId(authUser.id);
+          if (usuarioExistente) {
+            console.log('Usuário recuperado com sucesso:', usuarioExistente);
+            return usuarioExistente;
+          }
         }
-      })
-    );
-    
-    if (updateError) {
-      console.error('Erro ao atualizar metadados do usuário:', updateError);
-      // Não vamos falhar aqui, pois o usuário já foi criado na tabela usuarios
+        
+        // Se não for um erro de conflito ou não conseguir recuperar o usuário, retornar null
+        return null;
+      }
+      
+      if (!createdData) {
+        console.error('Nenhum dado retornado ao criar usuário');
+        return null;
+      }
+      
+      console.log('Usuário criado com sucesso:', createdData);
+      
+      // Atualizar os metadados do usuário no auth
+      try {
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: {
+            organizacao_id: organizacaoId,
+            organizacao_nome: organizacaoNome,
+            nome: dados.nome,
+            perfil: dados.perfil
+          }
+        });
+        
+        if (updateError) {
+          console.error('Erro ao atualizar metadados do usuário:', updateError);
+          // Não vamos falhar aqui, pois o usuário já foi criado na tabela usuarios
+        } else {
+          console.log('Metadados do usuário atualizados com sucesso');
+        }
+      } catch (updateError) {
+        console.error('Exceção ao atualizar metadados do usuário:', updateError);
+        // Não vamos falhar aqui, pois o usuário já foi criado na tabela usuarios
+      }
+      
+      return createdData as UsuarioData;
+    } catch (createError) {
+      console.error('Exceção ao criar usuário na tabela usuarios:', createError);
+      return null;
     }
-    
-    return resultado;
   } catch (error) {
-    console.error('Erro ao criar usuário:', error);
+    console.error('Erro geral ao criar usuário:', error);
     return null;
   }
 }
