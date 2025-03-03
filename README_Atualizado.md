@@ -1,10 +1,10 @@
-# Evolução Política - Sistema de Gestão de Campanha
+# Mara Caseiro - Sistema de Gestão de Campanha
 
 Sistema completo para gestão de campanhas políticas, apoiadores, demandas, eventos e apoios políticos.
 
 ## Visão Geral
 
-O Evolução Política é uma plataforma web desenvolvida com Next.js, React e TypeScript, projetada para auxiliar candidatos e equipes de campanha na gestão eficiente de todos os aspectos de uma campanha política. O sistema oferece funcionalidades para gerenciar apoiadores, demandas, eventos, apoios políticos e regiões, além de contar com um assistente de IA para análise de dados e geração de conteúdo.
+Plataforma web desenvolvida com Next.js, React e TypeScript, projetada para auxiliar candidatos e equipes de campanha na gestão eficiente de todos os aspectos de uma campanha política. O sistema oferece funcionalidades para gerenciar apoiadores, demandas, eventos, apoios políticos e regiões, além de contar com um assistente de IA para análise de dados e geração de conteúdo.
 
 ## Funcionalidades Principais
 
