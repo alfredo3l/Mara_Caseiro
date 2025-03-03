@@ -112,13 +112,22 @@ export default function NovoApoiador() {
     // Lidar com campos aninhados
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
-      setFormData(prevData => ({
-        ...prevData,
-        [parent]: {
-          ...prevData[parent as keyof typeof prevData] as Record<string, string>,
-          [child]: value,
-        },
-      }));
+      setFormData(prevData => {
+        // Obter o objeto pai atual ou criar um novo se não existir
+        const parentObj = prevData[parent as keyof typeof prevData] || {};
+        
+        // Criar uma cópia do objeto pai com a nova propriedade
+        const updatedParentObj = {
+          ...parentObj,
+          [child]: value
+        };
+        
+        // Retornar o novo estado com o objeto pai atualizado
+        return {
+          ...prevData,
+          [parent]: updatedParentObj
+        };
+      });
     } else {
       setFormData({
         ...formData,

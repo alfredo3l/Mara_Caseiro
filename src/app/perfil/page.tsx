@@ -33,6 +33,7 @@ export default function PaginaPerfil() {
   const [errorMessage, setErrorMessage] = useState('');
   const [bucketExists, setBucketExists] = useState<boolean | null>(null);
   const [checkingBucket, setCheckingBucket] = useState(true);
+  const [missingColumns, setMissingColumns] = useState<string[]>([]);
   
   const { usuario, carregando, erro, uploadFotoPerfil, atualizarPerfil, removerFotoPerfil } = useUsuario();
   const { user, loading: authLoading } = useAuthContext();
@@ -59,6 +60,9 @@ export default function PaginaPerfil() {
   // Atualizar o estado local quando o usuário for carregado
   useEffect(() => {
     if (usuario) {
+      console.log('Atualizando formulário com dados do usuário:', usuario);
+      console.log('Campo cargo (vem do campo perfil na tabela):', usuario.cargo);
+      
       setFormData({
         nome: usuario.nome || '',
         email: user?.email || '',
@@ -67,6 +71,7 @@ export default function PaginaPerfil() {
       });
       
       if (usuario.fotoPerfil) {
+        console.log('Definindo foto de perfil:', usuario.fotoPerfil);
         setFotoPerfilTemp(usuario.fotoPerfil);
       }
     }
@@ -89,6 +94,46 @@ export default function PaginaPerfil() {
 
     checkBucket();
   }, []);
+
+  // Verificar se as colunas necessárias existem
+  useEffect(() => {
+    if (usuario) {
+      const missing: string[] = [];
+      
+      // Verificar se o campo telefone existe
+      if (!('telefone' in usuario)) {
+        missing.push('telefone');
+      }
+      
+      // Verificar se o campo fotoPerfil existe
+      if (!('fotoPerfil' in usuario)) {
+        missing.push('foto_url');
+      }
+      
+      setMissingColumns(missing);
+    }
+  }, [usuario]);
+
+  // Remover avisos de debug da interface
+  useEffect(() => {
+    // Limpar mensagens de erro relacionadas a colunas faltantes ou buckets não existentes
+    if (erro) {
+      if (
+        erro.includes('coluna') || 
+        erro.includes('Execute o script de migração') ||
+        erro.includes('bucket') ||
+        erro.includes('não existe')
+      ) {
+        // Limpar erro após 1 segundo para não mostrar ao usuário
+        const timer = setTimeout(() => {
+          // Não temos acesso direto à função setErro, então vamos usar outra abordagem
+          setErrorMessage('');
+        }, 1000);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [erro]);
 
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -117,6 +162,12 @@ export default function PaginaPerfil() {
       // Verificar tipo do arquivo
       if (!file.type.startsWith('image/')) {
         throw new Error('O arquivo deve ser uma imagem');
+      }
+      
+      // Verificar se o bucket existe
+      const bucketExists = await profilePhotoStorage.checkBucketExists();
+      if (!bucketExists) {
+        throw new Error('O sistema não está configurado para armazenar imagens. Entre em contato com o administrador.');
       }
       
       // Fazer upload da imagem
@@ -223,6 +274,18 @@ export default function PaginaPerfil() {
         throw new Error('O nome é obrigatório');
       }
       
+      // Verificar se o usuário existe e tem um ID válido
+      if (!usuario || !usuario.id) {
+        throw new Error('Dados do usuário não encontrados. Por favor, faça login novamente.');
+      }
+      
+      // Verificar se o ID do usuário é um UUID válido
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(usuario.id)) {
+        console.error('ID do usuário não é um UUID válido:', usuario.id);
+        throw new Error('ID do usuário inválido. Por favor, faça login novamente.');
+      }
+      
       const dadosAtualizados: {
         nome: string;
         telefone: string;
@@ -233,7 +296,9 @@ export default function PaginaPerfil() {
         cargo: formData.cargo.trim()
       };
       
-      console.log('Dados a serem atualizados:', dadosAtualizados);
+      console.log('Dados a serem atualizados (cargo será mapeado para perfil na API):', dadosAtualizados);
+      console.log('Campo cargo atual:', formData.cargo);
+      console.log('ID do usuário:', usuario.id);
       
       const sucesso = await atualizarPerfil(dadosAtualizados);
       console.log('Resultado da atualização:', sucesso);
@@ -267,7 +332,7 @@ export default function PaginaPerfil() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col">
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -283,239 +348,163 @@ export default function PaginaPerfil() {
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Meu Perfil</h1>
           
-          {/* Aviso de bucket não existente */}
-          {!checkingBucket && bucketExists === false && (
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
-              <p className="font-bold">Atenção</p>
-              <p>
-                O sistema não está configurado corretamente para armazenar imagens de perfil.
-                Entre em contato com o administrador para resolver este problema.
-              </p>
-              <p className="text-sm mt-2">
-                <a 
-                  href="https://github.com/seu-usuario/seu-repositorio/blob/main/scripts/README.md" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  Consulte a documentação para mais informações
-                </a>
-              </p>
-            </div>
-          )}
-
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">Informações do Perfil</h3>
-              
-              {carregando || isUploading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-pulse flex flex-col items-center">
-                    <div className="rounded-full bg-gray-200 h-24 w-24 mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-48 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-32"></div>
-                  </div>
-                </div>
-              ) : erro ? (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-center">
-                    <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-                    <p className="text-red-700 text-sm">{erro}</p>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* Campo de foto do usuário */}
-                  <div className="mb-6">
-                    <label htmlFor="foto-perfil" className="block text-sm font-medium text-gray-700 mb-2">
-                      Foto do Perfil
-                    </label>
-                    <div className="flex items-center gap-4">
-                      {fotoPerfilTemp ? (
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden border border-gray-200 group">
-                          <Image
-                            src={fotoPerfilTemp}
-                            alt="Foto de perfil"
-                            fill
-                            className="object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleRemoveImage}
-                            disabled={isUploading}
-                            className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            aria-label="Remover foto"
-                          >
-                            <X className="w-6 h-6 text-white" />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-                          <User className="w-12 h-12 text-gray-400" />
-                        </div>
-                      )}
-                      <label 
-                        htmlFor="foto-input"
-                        className={`flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 
-                          ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'} 
-                          focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all`}
-                      >
-                        {isUploading ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-                            Enviando...
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-4 h-4" />
-                            Escolher foto
-                          </>
-                        )}
-                      </label>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        id="foto-input"
-                        accept="image/*"
-                        onChange={handleImageSelect}
-                        disabled={isUploading}
-                        className="hidden"
-                      />
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Seção da foto de perfil */}
+              <div className="flex flex-col items-center">
+                <div className="relative w-32 h-32 mb-4">
+                  {fotoPerfilTemp ? (
+                    <Image
+                      src={fotoPerfilTemp}
+                      alt="Foto de perfil"
+                      fill
+                      className="rounded-full object-cover border-2 border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300">
+                      <User className="w-16 h-16 text-gray-400" />
                     </div>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Recomendado: JPG, PNG. Tamanho máximo 2MB.
-                    </p>
-                    
-                    {/* Informações de debug */}
-                    {process.env.NODE_ENV === 'development' && (
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Informações de Debug</h4>
-                        <div className="text-xs text-gray-600 space-y-1">
-                          <p>Foto atual: {fotoPerfilTemp ? 'Sim' : 'Não'}</p>
-                          <p>Foto do usuário: {usuario?.fotoPerfil ? 'Sim' : 'Não'}</p>
-                          <p>URL da foto: {fotoPerfilTemp ? fotoPerfilTemp.substring(0, 50) + '...' : 'N/A'}</p>
-                          <p>URL da foto do usuário: {usuario?.fotoPerfil ? usuario.fotoPerfil.substring(0, 50) + '...' : 'N/A'}</p>
-                          <p>Bucket: {process.env.NEXT_PUBLIC_SUPABASE_URL ? 'profile-photos' : 'mock-bucket'}</p>
-                          <p>Usando mock: {!process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Sim' : 'Não'}</p>
-                          <p>ID do usuário: {usuario?.id || 'N/A'}</p>
-                          <p>Auth ID: {user?.id || 'N/A'}</p>
-                          <button 
-                            onClick={() => console.log('Dados do usuário:', usuario, 'Auth:', user)} 
-                            className="mt-2 px-2 py-1 bg-gray-200 rounded text-xs"
-                          >
-                            Log dados no console
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  )}
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-1">
-                        Nome Completo
-                      </label>
-                      <input
-                        type="text"
-                        id="nome"
-                        className="w-full h-10 px-4 bg-white border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
-                        value={formData.nome}
-                        onChange={handleInputChange}
-                      />
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
                     </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                        E-mail
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        className="w-full h-10 px-4 bg-white border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all disabled:bg-gray-100 disabled:text-gray-500"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        disabled={!!user} // Email não pode ser alterado se estiver autenticado
-                      />
-                      {user && (
-                        <p className="mt-1 text-xs text-gray-500">
-                          O e-mail não pode ser alterado pois está vinculado à sua conta.
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-1">
-                        Telefone
-                      </label>
-                      <input
-                        type="tel"
-                        id="telefone"
-                        className="w-full h-10 px-4 bg-white border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
-                        value={formData.telefone}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="cargo" className="block text-sm font-medium text-gray-700 mb-1">
-                        Cargo
-                      </label>
-                      <input
-                        type="text"
-                        id="cargo"
-                        className="w-full h-10 px-4 bg-white border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all disabled:bg-gray-100 disabled:text-gray-500"
-                        value={formData.cargo}
-                        onChange={handleInputChange}
-                        disabled={!!user && !usuario?.isAdmin} // Cargo não pode ser alterado por usuários comuns
-                      />
-                      {user && !usuario?.isAdmin && (
-                        <p className="mt-1 text-xs text-gray-500">
-                          O cargo só pode ser alterado por administradores.
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                  )}
+                </div>
+                
+                <div className="flex gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="px-3 py-1.5 text-sm bg-primary text-white rounded-md hover:bg-primary-dark transition-colors flex items-center gap-1"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>Upload</span>
+                  </button>
                   
-                  <div className="flex justify-end mt-8">
+                  {fotoPerfilTemp && (
                     <button
                       type="button"
-                      onClick={handleSaveProfile}
-                      disabled={isSaving}
-                      className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white 
-                        ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark'} 
-                        transition-colors`}
+                      onClick={handleRemoveImage}
+                      disabled={isUploading}
+                      className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center gap-1"
                     >
-                      {isSaving ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          Salvando...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4" />
-                          Salvar Alterações
-                        </>
-                      )}
+                      <X className="w-4 h-4" />
+                      <span>Remover</span>
                     </button>
+                  )}
+                  
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageSelect}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+              </div>
+              
+              {/* Seção dos dados do perfil */}
+              <div className="flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-1">
+                      Nome completo
+                    </label>
+                    <input
+                      type="text"
+                      id="nome"
+                      value={formData.nome}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
                   </div>
                   
-                  {/* Mensagens de feedback */}
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={formData.email}
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">O email não pode ser alterado</p>
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-1">
+                      Telefone
+                    </label>
+                    <input
+                      type="tel"
+                      id="telefone"
+                      value={formData.telefone}
+                      onChange={handleInputChange}
+                      placeholder="(00) 00000-0000"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="cargo" className="block text-sm font-medium text-gray-700 mb-1">
+                      Cargo
+                    </label>
+                    <input
+                      type="text"
+                      id="cargo"
+                      value={formData.cargo}
+                      onChange={handleInputChange}
+                      disabled={!usuario?.isAdmin}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md ${
+                        !usuario?.isAdmin ? 'bg-gray-50 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent'
+                      }`}
+                    />
+                    {!usuario?.isAdmin && (
+                      <p className="text-xs text-gray-500 mt-1">Apenas administradores podem alterar o cargo</p>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors flex items-center gap-2"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                        <span>Salvando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>Salvar alterações</span>
+                      </>
+                    )}
+                  </button>
+                  
                   {saveSuccess && (
-                    <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                        <p className="text-green-700 text-sm">Perfil atualizado com sucesso!</p>
-                      </div>
+                    <div className="flex items-center text-green-600">
+                      <CheckCircle className="w-5 h-5 mr-1" />
+                      <span>Alterações salvas com sucesso!</span>
                     </div>
                   )}
                   
                   {saveError && (
-                    <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
-                      <div className="flex items-center">
-                        <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-                        <p className="text-red-700 text-sm">{errorMessage || 'Erro ao atualizar o perfil. Tente novamente.'}</p>
-                      </div>
+                    <div className="flex items-center text-red-600">
+                      <AlertCircle className="w-5 h-5 mr-1" />
+                      <span>{errorMessage || 'Erro ao salvar alterações'}</span>
                     </div>
                   )}
-                </>
-              )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

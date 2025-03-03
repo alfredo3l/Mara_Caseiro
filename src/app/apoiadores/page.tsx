@@ -289,22 +289,22 @@ export default function PaginaApoiadores() {
                         <td className="px-4 md:px-6 py-4">
                           <div className="flex items-center gap-1 text-sm text-gray-600">
                             <Phone className="w-4 h-4 text-gray-400" />
-                            <span>{apoiador.telefone || 'Não informado'}</span>
+                            <span>{apoiador.contato?.telefone || 'Não informado'}</span>
                           </div>
                           <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
                             <Mail className="w-4 h-4 text-gray-400" />
-                            <span>{apoiador.email || 'Não informado'}</span>
+                            <span>{apoiador.contato?.email || 'Não informado'}</span>
                           </div>
                         </td>
                         <td className="px-4 md:px-6 py-4">
                           <div className="flex items-center gap-1 text-sm text-gray-600">
                             <MapPin className="w-4 h-4 text-gray-400" />
-                            <span>{apoiador.bairro || 'Não informado'}</span>
+                            <span>{apoiador.endereco?.bairro || 'Não informado'}</span>
                           </div>
-                          <div className="text-sm text-gray-500 mt-1">{apoiador.cidade || 'Não informado'}</div>
+                          <div className="text-sm text-gray-500 mt-1">{apoiador.endereco?.cidade || 'Não informado'}</div>
                         </td>
                         <td className="px-4 md:px-6 py-4 text-sm text-gray-600">
-                          {apoiador.lideranca?.nome || 'Sem liderança'}
+                          {apoiador.liderancaId ? `Liderança ID: ${apoiador.liderancaId}` : 'Sem liderança'}
                         </td>
                         <td className="px-4 md:px-6 py-4">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getNivelEngajamentoColor(apoiador.nivelEngajamento)}`}>

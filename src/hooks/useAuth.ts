@@ -312,6 +312,15 @@ export function useAuth() {
       console.log('Iniciando processo de logout...');
       setState(prev => ({ ...prev, loading: true }));
       
+      // Limpar dados do usuário no localStorage
+      try {
+        localStorage.removeItem('usuario');
+        console.log('Dados do usuário removidos do localStorage');
+      } catch (localStorageError) {
+        console.error('Erro ao limpar localStorage:', localStorageError);
+        // Não falhar se houver erro ao limpar o localStorage
+      }
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {

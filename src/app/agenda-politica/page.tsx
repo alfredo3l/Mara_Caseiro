@@ -283,10 +283,10 @@ export default function PaginaAgendaPolitica() {
                         <td className="px-4 md:px-6 py-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <MapPin className="w-4 h-4 text-gray-400" />
-                            <span>{evento.local}</span>
+                            <span>{evento.local?.endereco || evento.local?.nome || 'Local não especificado'}</span>
                           </div>
-                          {evento.cidade && (
-                            <div className="text-xs text-gray-500 mt-1">{evento.cidade}</div>
+                          {evento.local?.cidade && (
+                            <div className="text-xs text-gray-500 mt-1">{evento.local.cidade}, {evento.local.estado}</div>
                           )}
                         </td>
                         <td className="px-4 md:px-6 py-4 text-sm text-gray-600">

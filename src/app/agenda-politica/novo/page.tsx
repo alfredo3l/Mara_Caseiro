@@ -82,6 +82,24 @@ export default function NovoCompromissoAgendaPolitica() {
         ...formData,
         dataRegistro: new Date().toISOString(),
         organizacaoId: '1', // Substitua pelo ID real da organização
+        // Converter o campo local de string para o formato de objeto esperado
+        local: {
+          cidade: formData.endereco.cidade,
+          estado: formData.endereco.estado,
+          endereco: formData.endereco.logradouro,
+          bairro: formData.endereco.bairro,
+          cep: formData.endereco.cep
+        },
+        // Garantir que o status seja um dos valores permitidos
+        status: 'Agendado' as 'Agendado' | 'Confirmado' | 'Em Andamento' | 'Concluído' | 'Cancelado',
+        // Garantir que o tipo seja um dos valores permitidos
+        tipo: (formData.tipo as 'Reunião' | 'Comício' | 'Caminhada' | 'Debate' | 'Entrevista' | 'Outro') || 'Outro',
+        // Converter o organizador para o formato esperado
+        organizador: {
+          id: '1', // Substitua pelo ID real do organizador
+          nome: typeof formData.organizador === 'string' ? formData.organizador : 'Organizador Padrão',
+          tipo: 'Coordenador' as 'Candidato' | 'Coordenador' | 'Liderança'
+        }
       };
 
       // Enviar para a API

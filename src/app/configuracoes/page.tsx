@@ -13,6 +13,19 @@ const ClientHeader = dynamic(() => import('@/components/layout/ClientHeader'), {
   ssr: false
 });
 
+// Definindo a interface para o tipo Tema
+interface Tema {
+  nome: string;
+  cores: {
+    background: string;
+    foreground: string;
+    primary: string;
+    secondary: string;
+    accent: string;
+    muted: string;
+  };
+}
+
 export default function PaginaConfiguracoes() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState('configuracoes');
@@ -160,7 +173,7 @@ export default function PaginaConfiguracoes() {
     }
   };
 
-  const iniciarEdicaoTema = (tema) => {
+  const iniciarEdicaoTema = (tema: Tema) => {
     setNovoTema({...tema});
     setModoEdicao(true);
     setTemaOriginal(tema.nome);

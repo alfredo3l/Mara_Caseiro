@@ -11,12 +11,18 @@ export interface UsuarioData {
   email: string;
   perfil: 'super_admin' | 'admin' | 'coordenador' | 'lideranca' | 'apoiador';
   status: 'ativo' | 'inativo' | 'pendente';
+  telefone?: string;
+  foto_url?: string;
+  ultimo_acesso?: string;
 }
 
 export interface AtualizarUsuarioParams {
   nome?: string;
   perfil?: 'super_admin' | 'admin' | 'coordenador' | 'lideranca' | 'apoiador';
   status?: 'ativo' | 'inativo' | 'pendente';
+  telefone?: string;
+  foto_url?: string;
+  ultimo_acesso?: string;
 }
 
 /**
@@ -26,16 +32,65 @@ export interface AtualizarUsuarioParams {
  */
 export async function obterUsuarioPorAuthId(authId: string): Promise<UsuarioData | null> {
   try {
-    const { data } = await usuariosService.customQuery<{ data: UsuarioData | null }>(
-      (query) => query
-        .select('*')
-        .eq('auth_id', authId)
-        .single()
-    );
+    console.log('Buscando usuário pelo auth_id:', authId);
     
-    return data;
+    // Fazer a consulta diretamente com o Supabase para ter mais controle
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('auth_id', authId)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.log('Usuário não encontrado para o auth_id:', authId);
+        return null;
+      }
+      
+      // Verificar se o erro é relacionado a problemas de rede ou conexão
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        console.error('Erro de rede ao obter usuário por auth_id:', error);
+        console.log('Tentando novamente com uma abordagem diferente...');
+        
+        // Tentar uma abordagem alternativa
+        try {
+          const { data: altData, error: altError } = await supabase
+            .from('usuarios')
+            .select('*')
+            .filter('auth_id', 'eq', authId)
+            .limit(1);
+            
+          if (altError) {
+            console.error('Erro alternativo ao obter usuário por auth_id:', altError);
+            return null;
+          }
+          
+          if (altData && altData.length > 0) {
+            console.log('Usuário encontrado com abordagem alternativa:', altData[0]);
+            return altData[0] as UsuarioData;
+          }
+          
+          console.log('Nenhum usuário encontrado com abordagem alternativa');
+          return null;
+        } catch (altCatchError) {
+          console.error('Exceção na abordagem alternativa:', altCatchError);
+          return null;
+        }
+      }
+      
+      console.error('Erro ao obter usuário por auth_id:', error);
+      return null;
+    }
+    
+    if (!data) {
+      console.log('Nenhum dado retornado para o auth_id:', authId);
+      return null;
+    }
+    
+    console.log('Usuário encontrado:', data);
+    return data as UsuarioData;
   } catch (error) {
-    console.error('Erro ao obter usuário por auth_id:', error);
+    console.error('Exceção ao obter usuário por auth_id:', error);
     return null;
   }
 }
@@ -62,7 +117,13 @@ export async function obterUsuarioPorId(id: string): Promise<UsuarioData | null>
  */
 export async function atualizarUsuario(id: string, dados: AtualizarUsuarioParams): Promise<UsuarioData | null> {
   try {
-    return await usuariosService.update<UsuarioData>(id, dados);
+    console.log('Atualizando usuário com ID:', id);
+    console.log('Dados para atualização:', dados);
+    
+    const resultado = await usuariosService.update<UsuarioData>(id, dados);
+    console.log('Resultado da atualização:', resultado);
+    
+    return resultado;
   } catch (error) {
     console.error('Erro ao atualizar usuário:', error);
     return null;

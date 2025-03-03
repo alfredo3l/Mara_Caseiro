@@ -1,8 +1,10 @@
+import React from 'react';
+
 export default function Cadastro() {
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Capturar os dados do formulário
-    const formData = new FormData(e.target);
+    const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get('name'),
       email: formData.get('email'),
