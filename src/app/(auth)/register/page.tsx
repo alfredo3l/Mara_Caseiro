@@ -119,10 +119,12 @@ export default function RegisterPage() {
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: 'url("https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/casa-civil-6mb6d1/assets/zc6v3pfnr6yr/HOME.png")',
+          backgroundImage: 'url("/fundo.png")',
+          backgroundPosition: 'center center',
+          backgroundSize: 'cover'
         }}
       >
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/40" />
+        <div className="absolute inset-0 backdrop-blur-[2px] bg-black/20" />
       </div>
 
       {/* Conteúdo */}
@@ -153,7 +155,7 @@ export default function RegisterPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Nome completo"
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F907A7]/20 focus:border-[#F907A7] bg-white"
                   required
                 />
               </div>
@@ -170,7 +172,7 @@ export default function RegisterPage() {
                   onChange={handleDocumentChange}
                   placeholder="CPF/CNPJ"
                   maxLength={18}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F907A7]/20 focus:border-[#F907A7] bg-white"
                   required
                 />
               </div>
@@ -186,7 +188,7 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="E-mail corporativo"
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F907A7]/20 focus:border-[#F907A7] bg-white"
                   required
                 />
               </div>
@@ -202,8 +204,8 @@ export default function RegisterPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Senha"
-                  className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white transition-colors ${
-                    passwordError ? 'border-red-500' : 'border-gray-300 focus:border-primary'
+                  className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F907A7]/20 bg-white transition-colors ${
+                    passwordError ? 'border-red-500' : 'border-gray-300 focus:border-[#F907A7]'
                   }`}
                   required
                 />
@@ -231,8 +233,8 @@ export default function RegisterPage() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   placeholder="Confirmar senha"
-                  className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white transition-colors ${
-                    passwordError ? 'border-red-500' : 'border-gray-300 focus:border-primary'
+                  className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F907A7]/20 bg-white transition-colors ${
+                    passwordError ? 'border-red-500' : 'border-gray-300 focus:border-[#F907A7]'
                   }`}
                   required
                 />
@@ -263,7 +265,7 @@ export default function RegisterPage() {
             className={`w-full py-2.5 px-4 font-medium rounded-lg transition-colors flex items-center justify-center ${
               passwordError || loading
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-primary hover:bg-primary/90 text-white'
+                : 'bg-[#F907A7] hover:bg-[#F907A7]/90 text-white'
             }`}
           >
             {loading ? (

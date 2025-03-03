@@ -231,10 +231,10 @@ export default function Sidebar({ isOpen, onClose, activeItem, onMenuItemClick }
               <div className={`w-full flex justify-center ${collapsed ? 'px-1' : 'px-2'}`}>
                 <Link href="/dashboard" className="cursor-pointer transition-opacity hover:opacity-80">
                   <Image 
-                    src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/autenticacao-celular-m-f-f-nf7da4/assets/66isl4ozqt0f/image_92.png" 
+                    src="/Logo_Mara_Caseiro.png" 
                     alt="Logo Deputada Mara Caseiro" 
-                    width={collapsed ? 60 : 180} 
-                    height={collapsed ? 60 : 70} 
+                    width={collapsed ? 80 : 220} 
+                    height={collapsed ? 80 : 85} 
                     className="object-contain"
                     priority
                   />

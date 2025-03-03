@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { X, Check, Mail, Smartphone, CreditCard, Eye, EyeOff, FileText, Upload, Building2, User, Plus, ChevronDown, Save, Trash2, Edit2 } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import Image from 'next/image';
+import COLORS from '@/config/colors';
 
 interface DialogProps {
   isOpen: boolean;
@@ -358,17 +359,17 @@ export function SignatureDialog({ isOpen, onClose }: { isOpen: boolean; onClose:
 
 // Diálogo de Tema
 export function ThemeDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const primaryColor = '#264450';
+  const primaryColor = COLORS.PRIMARY;
   const [selectedColor, setSelectedColor] = useState(primaryColor);
   const [isCustom, setIsCustom] = useState(false);
 
   const predefinedColors = [
-    { name: 'Primária', value: primaryColor },
-    { name: 'Roxo', value: '#7C3AED' },
-    { name: 'Verde', value: '#059669' },
-    { name: 'Vermelho', value: '#DC2626' },
-    { name: 'Laranja', value: '#EA580C' },
-    { name: 'Rosa', value: '#DB2777' }
+    { name: 'Primária', value: COLORS.PRIMARY },
+    { name: 'Roxo', value: COLORS.PRESETS.find(color => color.nome === 'Roxo')?.valor || '#8B5CF6' },
+    { name: 'Verde', value: COLORS.GREEN.PRIMARY },
+    { name: 'Vermelho', value: COLORS.ERROR },
+    { name: 'Laranja', value: COLORS.PRESETS.find(color => color.nome === 'Laranja')?.valor || '#EA580C' },
+    { name: 'Rosa', value: COLORS.PRESETS.find(color => color.nome === 'Rosa')?.valor || '#DB2777' }
   ];
 
   const handleColorChange = (color: string) => {

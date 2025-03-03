@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import COLORS from '@/config/colors';
 
 interface Tema {
   nome: string;
@@ -25,31 +26,31 @@ const temasIniciais: Tema[] = [
   {
     nome: 'Padrão',
     cores: {
-      background: '#ffffff',
-      foreground: '#171717',
-      primary: '#0F509C',
-      primaryLight: '#0F509C',
-      border: '#e5e5e5',
+      background: COLORS.BACKGROUND,
+      foreground: COLORS.FOREGROUND,
+      primary: COLORS.PRIMARY,
+      primaryLight: COLORS.PRIMARY_LIGHT,
+      border: COLORS.BORDER,
     },
   },
   {
     nome: 'Escuro',
     cores: {
-      background: '#121212',
-      foreground: '#f5f5f5',
-      primary: '#3B82F6',
-      primaryLight: '#60A5FA',
-      border: '#2e2e2e',
+      background: COLORS.DARK.BACKGROUND,
+      foreground: COLORS.DARK.FOREGROUND,
+      primary: COLORS.DARK.PRIMARY,
+      primaryLight: COLORS.DARK.PRIMARY_LIGHT,
+      border: COLORS.DARK.BORDER,
     },
   },
   {
     nome: 'Verde',
     cores: {
-      background: '#ffffff',
-      foreground: '#171717',
-      primary: '#10B981',
-      primaryLight: '#34D399',
-      border: '#e5e5e5',
+      background: COLORS.BACKGROUND,
+      foreground: COLORS.FOREGROUND,
+      primary: COLORS.GREEN.PRIMARY,
+      primaryLight: COLORS.GREEN.PRIMARY_LIGHT,
+      border: COLORS.BORDER,
     },
   },
 ];

@@ -2,11 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 
+ * IMPORTANTE: As cores abaixo são definidas inicialmente aqui, mas snciadas 
+ * dinamicamente pelo TemaContext que utiliza as constantes do arquivo src/config/colors.ts
+ * Para alterar as cores do sistema, edite o arquivo colors.ts
+ */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --primary: #f907a7;
-  --primary-light: #fa38b8;
+  --primary: #c63b88;
+  --primary-light: #3291ff;
   --border: #e5e5e5;
 }
 

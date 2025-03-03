@@ -7,6 +7,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import Image from 'next/image';
 import { useUsuario } from '@/contexts/UsuarioContext';
 import { useTema } from '@/contexts/TemaContext';
+import COLORS from '@/config/colors';
 
 const ClientHeader = dynamic(() => import('@/components/layout/ClientHeader'), {
   ssr: false
@@ -46,16 +47,7 @@ export default function PaginaConfiguracoes() {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [temaOriginal, setTemaOriginal] = useState('');
 
-  const coresPredefinidas = [
-    { nome: 'Azul', valor: '#0F509C' },
-    { nome: 'Verde', valor: '#10B981' },
-    { nome: 'Vermelho', valor: '#EF4444' },
-    { nome: 'Roxo', valor: '#8B5CF6' },
-    { nome: 'Laranja', valor: '#F97316' },
-    { nome: 'Rosa', valor: '#EC4899' },
-    { nome: 'Amarelo', valor: '#F59E0B' },
-    { nome: 'Cinza', valor: '#6B7280' },
-  ];
+  const coresPredefinidas = COLORS.PRESETS;
 
   useEffect(() => {
     const handleResize = () => {

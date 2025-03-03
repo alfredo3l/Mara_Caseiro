@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
             
             <Link 
               href="/login" 
-              className="block w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors text-center"
+              className="block w-full py-2.5 px-4 bg- hover:bg-/90 text-white font-medium rounded-lg transition-colors text-center"
             >
               Voltar para o login
             </Link>
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Seu e-mail"
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-/20 focus:border- bg-white"
                   required
                 />
               </div>
@@ -95,7 +95,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center ${
+              className={`w-full py-2.5 px-4 bg- hover:bg-/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center ${
                 loading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >

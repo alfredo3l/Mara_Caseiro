@@ -12,7 +12,7 @@ export function Link({ className, variant = 'primary', ...props }: LinkProps) {
       className={clsx(
         'font-medium transition-colors',
         {
-          'text-primary hover:text-primary/80': variant === 'primary',
+          'text-[#F907A7] hover:text-[#F907A7]/80': variant === 'primary',
           'text-gray-600 hover:text-gray-800': variant === 'secondary',
         },
         className

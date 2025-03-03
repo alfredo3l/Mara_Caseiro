@@ -93,10 +93,12 @@ export default function LoginPage() {
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: 'url("https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/casa-civil-6mb6d1/assets/zc6v3pfnr6yr/HOME.png")',
+          backgroundImage: 'url("/fundo.png")',
+          backgroundPosition: 'center center',
+          backgroundSize: 'cover'
         }}
       >
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/40" />
+        <div className="absolute inset-0 backdrop-blur-[2px] bg-black/20" />
       </div>
 
       {/* Conteúdo */}
@@ -127,7 +129,7 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="Seu e-mail"
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F907A7]/20 focus:border-[#F907A7] bg-white"
                   required
                 />
               </div>
@@ -143,7 +145,7 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Sua senha"
-                  className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"
+                  className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F907A7]/20 focus:border-[#F907A7] bg-white"
                   required
                 />
                 <button
@@ -165,7 +167,7 @@ export default function LoginPage() {
             <NoSSR>
               <Link
                 href="/forgot-password"
-                className="text-sm text-primary hover:text-primary/80 font-medium"
+                className="text-sm text-[#F907A7] hover:text-[#F907A7]/80 font-medium"
                 prefetch={false}
                 key="forgot-password-link"
               >
@@ -177,7 +179,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center ${
+            className={`w-full py-2.5 px-4 bg-[#F907A7] hover:bg-[#F907A7]/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center ${
               loading ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
