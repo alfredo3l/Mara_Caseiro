@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nome": "Capital",
+    "cor": "#4CAF50",
+    "coordenador_id": null,
+    "municipios": [1]
+  },
+  {
+    "id": 2,
+    "nome": "Sul",
+    "cor": "#2196F3",
+    "coordenador_id": null,
+    "municipios": [2, 5]
+  },
+  {
+    "id": 3,
+    "nome": "Leste",
+    "cor": "#FFC107",
+    "coordenador_id": null,
+    "municipios": [3]
+  },
+  {
+    "id": 4,
+    "nome": "Pantanal",
+    "cor": "#9C27B0",
+    "coordenador_id": null,
+    "municipios": [4]
+  }
+] 

@@ -1,0 +1,5 @@
+[33mcommit 85258ca1522aa50c88dd8fef45ee3fcf6f4ebc78[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Alfredo Oliveira <estanciamorroazul@gmail.com>
+Date:   Sat Mar 1 14:36:47 2025 -0400
+
+    feat: implementação de módulos de gestão de campanha

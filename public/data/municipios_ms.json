@@ -1,0 +1,115 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 1,
+        "nome": "Campo Grande",
+        "regiao_id": 1,
+        "populacao": 906092,
+        "area": 8092.951
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-54.6484, -20.4435],
+            [-54.6484, -20.5435],
+            [-54.5484, -20.5435],
+            [-54.5484, -20.4435],
+            [-54.6484, -20.4435]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 2,
+        "nome": "Dourados",
+        "regiao_id": 2,
+        "populacao": 225495,
+        "area": 4086.237
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-54.8064, -22.2027],
+            [-54.8064, -22.3027],
+            [-54.7064, -22.3027],
+            [-54.7064, -22.2027],
+            [-54.8064, -22.2027]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 3,
+        "nome": "Três Lagoas",
+        "regiao_id": 3,
+        "populacao": 123281,
+        "area": 10207.067
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-51.7081, -20.7513],
+            [-51.7081, -20.8513],
+            [-51.6081, -20.8513],
+            [-51.6081, -20.7513],
+            [-51.7081, -20.7513]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 4,
+        "nome": "Corumbá",
+        "regiao_id": 4,
+        "populacao": 111435,
+        "area": 64962.720
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-57.6542, -19.0095],
+            [-57.6542, -19.1095],
+            [-57.5542, -19.1095],
+            [-57.5542, -19.0095],
+            [-57.6542, -19.0095]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 5,
+        "nome": "Ponta Porã",
+        "regiao_id": 2,
+        "populacao": 93937,
+        "area": 5330.448
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-55.7256, -22.5296],
+            [-55.7256, -22.6296],
+            [-55.6256, -22.6296],
+            [-55.6256, -22.5296],
+            [-55.7256, -22.5296]
+          ]
+        ]
+      }
+    }
+  ]
+} 
